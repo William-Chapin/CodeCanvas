@@ -6,36 +6,43 @@ const MAX_WIDTH = 800;
 const MIN_WIDTH = 400;
 const PADDING = 40;
 
-codeInput.style.whiteSpace = 'pre-wrap';
-codeInput.style.wordWrap = 'break-word';
-codeInput.style.width = `${MAX_WIDTH}px`;
-codeInput.style.minWidth = `${MIN_WIDTH}px`;
-codeInput.style.maxWidth = `${MAX_WIDTH}px`;
-codeInput.style.overflowX = 'hidden';
-codeInput.style.overflowY = 'auto';
-codeInput.style.resize = 'none';
-codeInput.style.height = 'auto';
-codeInput.style.width = 'auto';
+if (codeInput) {
+    codeInput.style.whiteSpace = 'pre-wrap';
+    codeInput.style.wordWrap = 'break-word';
+    codeInput.style.width = 'auto';
+    codeInput.style.minWidth = `${MIN_WIDTH}px`;
+    codeInput.style.maxWidth = `${MAX_WIDTH}px`;
+    codeInput.style.overflowX = 'hidden';
+    codeInput.style.overflowY = 'auto';
+    codeInput.style.resize = 'none';
+    codeInput.style.height = 'auto';
+    codeInput.style.display = 'inline-block';
+}
 
 const container = document.querySelector('.container');
-container.style.width = `${MAX_WIDTH}px`;
-container.style.minWidth = `${MIN_WIDTH}px`;
-container.style.maxWidth = `${MAX_WIDTH}px`;
+if (container) {
+    container.style.width = '100%';
+    container.style.minWidth = `${MIN_WIDTH}px`;
+    container.style.maxWidth = `${MAX_WIDTH}px`;
+}
 
 const settings = document.querySelector('.settings');
-settings.style.width = '100%';
-settings.style.flexWrap = 'wrap';
-settings.style.gap = '10px';
+if (settings) {
+    settings.style.width = '100%';
+    settings.style.flexWrap = 'wrap';
+    settings.style.gap = '10px';
+}
 
 const title = document.querySelector('.title');
-
-window.addEventListener('scroll', () => {
-    if (window.scrollY > 0) {
-        title.style.display = 'none';
-    } else {
-        title.style.display = 'block';
-    }
-});
+if (title) {
+    window.addEventListener('scroll', () => {
+        if (window.scrollY > 0) {
+            title.style.display = 'none';
+        } else {
+            title.style.display = 'block';
+        }
+    });
+}
 
 function getCaretCharacterOffsetWithin(element) {
     let caretOffset = 0;
@@ -151,6 +158,15 @@ function changeBackgroundColor() {
     codeBox.style.backgroundColor = bgColor;
 }
 
+function cropCanvas(canvas, cropSize) {
+    const croppedCanvas = document.createElement('canvas');
+    const ctx = croppedCanvas.getContext('2d');
+    croppedCanvas.width = canvas.width - cropSize * 2;
+    croppedCanvas.height = canvas.height - cropSize * 2;
+    ctx.drawImage(canvas, cropSize, cropSize, croppedCanvas.width, croppedCanvas.height, 0, 0, croppedCanvas.width, croppedCanvas.height);
+    return croppedCanvas;
+}
+
 function exportToImage() {
     const originalBorder = codeBox.style.border;
     const originalBackgroundColor = codeBox.style.backgroundColor;
@@ -159,18 +175,24 @@ function exportToImage() {
 
     html2canvas(codeBox, {
         backgroundColor: null,
+        scale: 3,
+        useCORS: true,
+        timeout: 10000,
         onclone: (clonedDoc) => {
             clonedDoc.getElementById('codeBox').style.borderRadius = '6px';
             clonedDoc.getElementById('codeBox').style.backgroundColor = originalBackgroundColor;
         }
     }).then(canvas => {
+        const croppedCanvas = cropCanvas(canvas, 4);
         const link = document.createElement('a');
         link.download = 'code.png';
-        link.href = canvas.toDataURL('image/png');
+        link.href = croppedCanvas.toDataURL('image/png');
         link.click();
 
         codeBox.style.border = originalBorder;
         codeBox.style.backgroundColor = originalBackgroundColor;
+    }).catch(error => {
+        console.error('Failed to generate the image:', error);
     });
 }
 
@@ -182,12 +204,16 @@ function copyToClipboard() {
 
     html2canvas(codeBox, {
         backgroundColor: null,
+        scale: 3,
+        useCORS: true,
+        timeout: 10000,
         onclone: (clonedDoc) => {
             clonedDoc.getElementById('codeBox').style.borderRadius = '6px';
             clonedDoc.getElementById('codeBox').style.backgroundColor = originalBackgroundColor;
         }
     }).then(canvas => {
-        canvas.toBlob(blob => {
+        const croppedCanvas = cropCanvas(canvas, 4);
+        croppedCanvas.toBlob(blob => {
             if (!blob) {
                 console.error('Failed to generate the image blob.');
                 return;
@@ -204,6 +230,8 @@ function copyToClipboard() {
             codeBox.style.border = originalBorder;
             codeBox.style.backgroundColor = originalBackgroundColor;
         });
+    }).catch(error => {
+        console.error('Failed to generate the image:', error);
     });
 }
 
@@ -235,7 +263,9 @@ function showCopyAnimation() {
         overlay.style.opacity = '0';
         overlay.style.transform = 'translate(-50%, -50%)';
         overlay.addEventListener('transitionend', () => {
-            document.body.removeChild(overlay);
+            if (overlay.parentNode) {
+                overlay.parentNode.removeChild(overlay);
+            }
         });
     }, 1500);
 }
@@ -304,4 +334,16 @@ codeInput.addEventListener('focus', () => {
 codeInput.addEventListener('blur', () => {
     codeInput.style.outline = '';
 });
+
+document.getElementById('modeSwitch').addEventListener('change', (event) => {
+    if (event.target.checked) {
+        document.body.classList.remove('dark-mode');
+        document.body.classList.add('light-mode');
+    } else {
+        document.body.classList.remove('light-mode');
+        document.body.classList.add('dark-mode');
+    }
+    updateSnowflakes();
+});
+
 formatCode();

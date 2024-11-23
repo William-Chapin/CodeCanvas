@@ -35,9 +35,10 @@
         }
 
         .code-box {
-            display: block;
-            width: 100%;
+            display: inline-block;
+            width: auto;
             min-width: 100px;
+            max-width: 100%;
             min-height: 50px;
             font-size: 18px;
             font-family: monospace;
@@ -144,12 +145,112 @@
             border-color: #007BFF;
             background-color: rgba(0, 123, 255, 0.1);
         }
+
+        .dark-mode {
+            background-color: #151314;
+            color: #abb2bf;
+        }
+
+        .light-mode {
+            background-color: #ffffff;
+            color: #000000;
+        }
+
+        .mode-switch {
+            position: fixed;
+            bottom: 10px;
+            left: 10px;
+            display: flex;
+            align-items: center;
+            font-size: 0.8rem;
+        }
+
+        .mode-switch input {
+            display: none;
+        }
+
+        .mode-switch label {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+
+        .mode-switch label input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .mode-switch label .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .mode-switch label .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        .mode-switch input:checked + .slider {
+            background-color: #2196F3;
+        }
+
+        .mode-switch input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+
+        .dark-mode .mode-switch {
+            color: white;
+        }
+
+        .light-mode .mode-switch {
+            color: black;
+        }
+
+        .dark-mode .settings img {
+            filter: invert(1);
+        }
+
+        .light-mode .settings img {
+            filter: invert(0);
+        }
+
+        .dark-mode .drop-area {
+            color: #ccc;
+        }
+
+        .light-mode .drop-area {
+            color: #000;
+        }
+
+        .dark-mode .footer {
+            color: white;
+        }
+
+        .light-mode .footer {
+            color: black;
+        }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
 
-<body>
+<body class="dark-mode">
     <canvas id="snowflakesCanvas"></canvas>
     <div class="container">
         <div class="drop-area" id="dropArea">Drag & Drop your code file here or click to upload</div>
@@ -208,6 +309,12 @@
     </div>
     <div class="footer">
         Inspired by <a href="https://carbon.now.sh" target="_blank">Carbon</a>
+    </div>
+    <div class="mode-switch">
+        <label>
+            <input type="checkbox" id="modeSwitch">
+            <span class="slider"></span>
+        </label>
     </div>
     <script src="app.js"></script>
     <script src="snowflakes.js"></script>
