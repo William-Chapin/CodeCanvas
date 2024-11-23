@@ -53,12 +53,39 @@
         }
 
         .code-box-header {
-            display: none;
+            display: flex;
+            align-items: center;
+            padding: 5px;
+            background-color: #282c34;
+            border-top-left-radius: 5px;
+            border-top-right-radius: 5px;
+        }
+
+        .code-box-header .dot {
+            height: 12px;
+            width: 12px;
+            border-radius: 50%;
+            margin-right: 5px;
+        }
+
+        .code-box-header .dot.red {
+            background-color: #ff5f56;
+        }
+
+        .code-box-header .dot.yellow {
+            background-color: #ffbd2e;
+        }
+
+        .code-box-header .dot.green {
+            background-color: #27c93f;
         }
 
         .code-box-content {
-            margin: 0;
-            padding: 0;
+            margin: 10px 0 0 10px; /* Add more spacing before the code starts */
+        }
+
+        .no-dots .code-box-content {
+            margin-top: 5px; /* Less spacing when dots are toggled off */
         }
 
         select {
@@ -248,6 +275,13 @@
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            if (/Mobi|Android/i.test(navigator.userAgent)) {
+                document.body.innerHTML = '<div style="text-align: center; margin-top: 50px; font-size: 1.5rem;">Mobile support coming soon</div>';
+            }
+        });
+    </script>
 </head>
 
 <body class="dark-mode">
@@ -290,7 +324,6 @@
                     <option value="r">R</option>
                     <option value="perl">Perl</option>
                     <option value="rust">Rust</option>
-                    <option value="scala">Scala</option>
                     <option value="shell">Shell</option>
                 </select>
             </div>
@@ -300,8 +333,14 @@
             </div>
             <button id="exportButton">Export to Image</button>
             <button id="copyButton">Copy to Clipboard</button>
+            <button id="toggleDotsButton">Toggle Buttons</button>
         </div>
         <div class="code-box" id="codeBox">
+            <div class="code-box-header" id="codeBoxHeader">
+                <div class="dot red"></div>
+                <div class="dot yellow"></div>
+                <div class="dot green"></div>
+            </div>
             <div id="codeInput" class="code-box-content" contenteditable="true" spellcheck="false" tabindex="0">while True:
     print("hi welcome to my website")
     print("here you can create cool images of your code!")</div>
@@ -310,7 +349,7 @@
     <div class="footer">
         Inspired by <a href="https://carbon.now.sh" target="_blank">Carbon</a>
     </div>
-    <div class="mode-switch">
+    <div class="mode-switch"></div>
         <label>
             <input type="checkbox" id="modeSwitch">
             <span class="slider"></span>

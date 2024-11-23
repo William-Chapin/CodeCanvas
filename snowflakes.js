@@ -50,7 +50,7 @@ function animateSnowflakes() {
 
 function initSnowflakes() {
     resizeCanvas();
-    for (let i = 0; i < 100; i++) {
+    for (let i = 0; i < 250; i++) {
         snowflakes.push(createSnowflake());
     }
     animateSnowflakes();

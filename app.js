@@ -193,6 +193,9 @@ function exportToImage() {
         codeBox.style.backgroundColor = originalBackgroundColor;
     }).catch(error => {
         console.error('Failed to generate the image:', error);
+        shopwAnimation('Failed to generate the image. Please try again.');
+        codeBox.style.border = originalBorder;
+        codeBox.style.backgroundColor = originalBackgroundColor;
     });
 }
 
@@ -216,13 +219,16 @@ function copyToClipboard() {
         croppedCanvas.toBlob(blob => {
             if (!blob) {
                 console.error('Failed to generate the image blob.');
+                shopwAnimation('Failed to generate the image. Please try again.');
+                codeBox.style.border = originalBorder;
+                codeBox.style.backgroundColor = originalBackgroundColor;
                 return;
             }
 
             navigator.clipboard.write([
                 new ClipboardItem({ 'image/png': blob })
             ]).then(() => {
-                showCopyAnimation();
+                shopwAnimation("Copied!");
             }).catch(err => {
                 console.error('Failed to copy image to clipboard:', err);
             });
@@ -232,12 +238,15 @@ function copyToClipboard() {
         });
     }).catch(error => {
         console.error('Failed to generate the image:', error);
+        shopwAnimation('Failed to generate the image. Please try again.');
+        codeBox.style.border = originalBorder;
+        codeBox.style.backgroundColor = originalBackgroundColor;
     });
 }
 
-function showCopyAnimation() {
+function shopwAnimation(text) {
     const overlay = document.createElement('div');
-    overlay.innerText = 'Copied!';
+    overlay.innerText = text;
     overlay.style.position = 'fixed';
     overlay.style.top = '50%';
     overlay.style.left = '50%';
@@ -344,6 +353,18 @@ document.getElementById('modeSwitch').addEventListener('change', (event) => {
         document.body.classList.add('dark-mode');
     }
     updateSnowflakes();
+});
+
+document.getElementById('toggleDotsButton').addEventListener('click', () => {
+    const codeBoxHeader = document.getElementById('codeBoxHeader');
+    const codeBox = document.getElementById('codeBox');
+    if (codeBoxHeader.style.display === 'none') {
+        codeBoxHeader.style.display = 'flex';
+        codeBox.classList.remove('no-dots');
+    } else {
+        codeBoxHeader.style.display = 'none';
+        codeBox.classList.add('no-dots');
+    }
 });
 
 formatCode();
