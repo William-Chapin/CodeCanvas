@@ -1,5 +1,6 @@
 const themeLink = document.getElementById('theme-link');
 const codeInput = document.getElementById('codeInput');
+const codeBox = document.getElementById('codeBox');
 
 const MAX_WIDTH = 800;
 const MIN_WIDTH = 400;
@@ -12,6 +13,9 @@ codeInput.style.minWidth = `${MIN_WIDTH}px`;
 codeInput.style.maxWidth = `${MAX_WIDTH}px`;
 codeInput.style.overflowX = 'hidden';
 codeInput.style.overflowY = 'auto';
+codeInput.style.resize = 'none';
+codeInput.style.height = 'auto';
+codeInput.style.width = 'auto';
 
 const container = document.querySelector('.container');
 container.style.width = `${MAX_WIDTH}px`;
@@ -22,6 +26,16 @@ const settings = document.querySelector('.settings');
 settings.style.width = '100%';
 settings.style.flexWrap = 'wrap';
 settings.style.gap = '10px';
+
+const title = document.querySelector('.title');
+
+window.addEventListener('scroll', () => {
+    if (window.scrollY > 0) {
+        title.style.display = 'none';
+    } else {
+        title.style.display = 'block';
+    }
+});
 
 function getCaretCharacterOffsetWithin(element) {
     let caretOffset = 0;
@@ -134,45 +148,46 @@ function validateAndApplyCustomTheme(url) {
 
 function changeBackgroundColor() {
     const bgColor = document.getElementById('bgColorInput').value;
-    codeInput.style.backgroundColor = bgColor;
+    codeBox.style.backgroundColor = bgColor;
 }
 
 function exportToImage() {
-    const originalHeight = codeInput.style.height;
-    codeInput.style.height = 'auto';
-    
-    html2canvas(codeInput).then(canvas => {
-        const croppedCanvas = document.createElement('canvas');
-        const ctx = croppedCanvas.getContext('2d');
-        croppedCanvas.width = canvas.width - 6;
-        croppedCanvas.height = canvas.height - 6;
-        ctx.drawImage(canvas, 3, 3, canvas.width - 6, canvas.height - 6, 0, 0, croppedCanvas.width, croppedCanvas.height);
+    const originalBorder = codeBox.style.border;
+    const originalBackgroundColor = codeBox.style.backgroundColor;
+    codeBox.style.border = 'none';
+    codeBox.style.backgroundColor = 'transparent';
 
+    html2canvas(codeBox, {
+        backgroundColor: null,
+        onclone: (clonedDoc) => {
+            clonedDoc.getElementById('codeBox').style.borderRadius = '6px';
+            clonedDoc.getElementById('codeBox').style.backgroundColor = originalBackgroundColor;
+        }
+    }).then(canvas => {
         const link = document.createElement('a');
         link.download = 'code.png';
-        link.href = croppedCanvas.toDataURL('image/png');
+        link.href = canvas.toDataURL('image/png');
         link.click();
-        
-        codeInput.style.height = originalHeight;
+
+        codeBox.style.border = originalBorder;
+        codeBox.style.backgroundColor = originalBackgroundColor;
     });
 }
 
 function copyToClipboard() {
-    const originalHeight = codeInput.style.height;
-    codeInput.style.height = 'auto';
+    const originalBorder = codeBox.style.border;
+    const originalBackgroundColor = codeBox.style.backgroundColor;
+    codeBox.style.border = 'none';
+    codeBox.style.backgroundColor = 'transparent';
 
-    html2canvas(codeInput).then(canvas => {
-        const croppedCanvas = document.createElement('canvas');
-        const ctx = croppedCanvas.getContext('2d');
-        croppedCanvas.width = canvas.width - 6;
-        croppedCanvas.height = canvas.height - 6;
-        ctx.drawImage(
-            canvas,
-            3, 3, canvas.width - 6, canvas.height - 6,
-            0, 0, croppedCanvas.width, croppedCanvas.height
-        );
-
-        croppedCanvas.toBlob(blob => {
+    html2canvas(codeBox, {
+        backgroundColor: null,
+        onclone: (clonedDoc) => {
+            clonedDoc.getElementById('codeBox').style.borderRadius = '6px';
+            clonedDoc.getElementById('codeBox').style.backgroundColor = originalBackgroundColor;
+        }
+    }).then(canvas => {
+        canvas.toBlob(blob => {
             if (!blob) {
                 console.error('Failed to generate the image blob.');
                 return;
@@ -186,7 +201,8 @@ function copyToClipboard() {
                 console.error('Failed to copy image to clipboard:', err);
             });
 
-            codeInput.style.height = originalHeight;
+            codeBox.style.border = originalBorder;
+            codeBox.style.backgroundColor = originalBackgroundColor;
         });
     });
 }
@@ -223,6 +239,51 @@ function showCopyAnimation() {
         });
     }, 1500);
 }
+
+const dropArea = document.getElementById('dropArea');
+
+dropArea.addEventListener('dragover', (event) => {
+    event.preventDefault();
+    dropArea.classList.add('dragover');
+});
+
+dropArea.addEventListener('dragleave', () => {
+    dropArea.classList.remove('dragover');
+});
+
+dropArea.addEventListener('drop', (event) => {
+    event.preventDefault();
+    dropArea.classList.remove('dragover');
+    const file = event.dataTransfer.files[0];
+    if (file && (file.type === 'text/plain' || file.name.endsWith('.py') || file.name.endsWith('.c') || file.name.endsWith('.cpp') || file.name.endsWith('.js') || file.name.endsWith('.java') || file.name.endsWith('.html') || file.name.endsWith('.css'))) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            codeInput.innerText = e.target.result;
+            formatCode();
+        };
+        reader.readAsText(file);
+    } else {
+        alert('Please drop a valid code file.');
+    }
+});
+
+dropArea.addEventListener('click', () => {
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.accept = '.txt,.py,.c,.cpp,.js,.java,.html,.css';
+    fileInput.onchange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                codeInput.innerText = e.target.result;
+                formatCode();
+            };
+            reader.readAsText(file);
+        }
+    };
+    fileInput.click();
+});
 
 document.getElementById('themeSelect').addEventListener('change', changeTheme);
 document.getElementById('languageSelect').addEventListener('change', formatCode);

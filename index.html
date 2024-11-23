@@ -7,6 +7,7 @@
     <title>Code Canvas</title>
     <link rel="stylesheet"
         href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/atom-one-dark.min.css" id="theme-link">
+    <link rel="icon" href="images/logo-transparent.png" type="image/png">
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -15,9 +16,9 @@
             background-color: #151314;
             display: flex;
             justify-content: center;
-            align-items: center;
-            height: 100vh;
-            overflow: hidden;
+            align-items: flex-start;
+            min-height: 100vh;
+            position: relative;
         }
 
         .settings {
@@ -30,10 +31,12 @@
         .container {
             width: 100%;
             max-width: 800px;
+            min-height: 100vh;
         }
 
         .code-box {
-            width: auto;
+            display: block;
+            width: 100%;
             min-width: 100px;
             min-height: 50px;
             font-size: 18px;
@@ -44,9 +47,17 @@
             background-color: #282c34;
             color: #abb2bf;
             overflow: hidden;
-            white-space: pre-wrap;
             word-wrap: break-word;
-            resize: both;
+            box-sizing: border-box;
+        }
+
+        .code-box-header {
+            display: none;
+        }
+
+        .code-box-content {
+            margin: 0;
+            padding: 0;
         }
 
         select {
@@ -90,7 +101,7 @@
         }
 
         #snowflakesCanvas {
-            position: absolute;
+            position: fixed;
             top: 0;
             left: 0;
             width: 100%;
@@ -103,21 +114,8 @@
             margin-left: 10px;
         }
 
-        .title {
-            position: absolute;
-            top: 35%;
-            left: 50%;
-            font-size: 1.5rem;
-            color: white;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-            z-index: 1000;
-            transform: translate(-50%, -50%);
-            pointer-events: none;
-        }
-
-
         .footer {
-            position: absolute;
+            position: fixed;
             bottom: 10px;
             right: 10px;
             font-size: 0.8rem;
@@ -132,15 +130,29 @@
         .footer a:hover {
             text-decoration: underline;
         }
+
+        .drop-area {
+            border: 2px dashed #ccc;
+            border-radius: 5px;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 20px;
+            color: #ccc;
+        }
+
+        .drop-area.dragover {
+            border-color: #007BFF;
+            background-color: rgba(0, 123, 255, 0.1);
+        }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
 
 <body>
-    <div class="title">Code Canvas</div>
     <canvas id="snowflakesCanvas"></canvas>
     <div class="container">
+        <div class="drop-area" id="dropArea">Drag & Drop your code file here or click to upload</div>
         <div class="settings">
             <div>
                 <img src="images/style.png" alt="Style">
@@ -165,6 +177,20 @@
                     <option value="python">Python</option>
                     <option value="html">HTML</option>
                     <option value="css">CSS</option>
+                    <option value="java">Java</option>
+                    <option value="csharp">C#</option>
+                    <option value="cpp">C++</option>
+                    <option value="ruby">Ruby</option>
+                    <option value="php">PHP</option>
+                    <option value="typescript">TypeScript</option>
+                    <option value="swift">Swift</option>
+                    <option value="go">Go</option>
+                    <option value="kotlin">Kotlin</option>
+                    <option value="r">R</option>
+                    <option value="perl">Perl</option>
+                    <option value="rust">Rust</option>
+                    <option value="scala">Scala</option>
+                    <option value="shell">Shell</option>
                 </select>
             </div>
             <div>
@@ -174,10 +200,11 @@
             <button id="exportButton">Export to Image</button>
             <button id="copyButton">Copy to Clipboard</button>
         </div>
-        <div id="codeInput" class="code-box" contenteditable="true" spellcheck="false" tabindex="0">while True:
+        <div class="code-box" id="codeBox">
+            <div id="codeInput" class="code-box-content" contenteditable="true" spellcheck="false" tabindex="0">while True:
     print("hi welcome to my website")
-    print("here you can create cool images of your code!")
-</div>
+    print("here you can create cool images of your code!")</div>
+        </div>
     </div>
     <div class="footer">
         Inspired by <a href="https://carbon.now.sh" target="_blank">Carbon</a>
