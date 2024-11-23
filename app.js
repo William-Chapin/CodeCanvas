@@ -156,6 +156,7 @@ function validateAndApplyCustomTheme(url) {
 function changeBackgroundColor() {
     const bgColor = document.getElementById('bgColorInput').value;
     codeBox.style.backgroundColor = bgColor;
+    document.getElementById('codeBoxHeader').style.backgroundColor = bgColor;
 }
 
 function cropCanvas(canvas, cropSize) {

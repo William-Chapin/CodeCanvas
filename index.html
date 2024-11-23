@@ -272,6 +272,22 @@
         .light-mode .footer {
             color: black;
         }
+
+        .light-mode button,
+        .light-mode select {
+            background-color: white;
+            color: black;
+            border: 1px solid black;
+        }
+
+        .light-mode button:hover,
+        .light-mode select:hover {
+            background-color: #f0f0f0;
+        }
+
+        .light-mode .code-box {
+            border: 1px solid black;
+        }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -349,7 +365,7 @@
     <div class="footer">
         Inspired by <a href="https://carbon.now.sh" target="_blank">Carbon</a>
     </div>
-    <div class="mode-switch"></div>
+    <div class="mode-switch">
         <label>
             <input type="checkbox" id="modeSwitch">
             <span class="slider"></span>
